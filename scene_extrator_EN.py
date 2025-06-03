@@ -9,7 +9,7 @@ class NovelCharacterEvents:
     def __init__(self):
         self.client = OpenAI(
             api_key="",
-            base_url="https://www.dmxapi.com/v1/"  
+            base_url="https://www.dmxapi.com/v1/"
         )
         self.chunk_size = 4000  # 每个分块的最大字符数
         self.overlap = 500      # 分块之间的重叠字符数
@@ -158,11 +158,12 @@ class NovelCharacterEvents:
         all_scenes["all_scenes"] = []
         
         scene_id = 1  # 事件ID计数器
-        
+
+        up_content = ""
         for i in range(len(chapters)):
             # 对每个章节进行处理
             print(f"处理第{i}章")
-            chapter_text = chapters[i]["text"]
+            chapter_text = up_content + chapters[i]["text"]
 
             
             prompt = f"""
@@ -208,6 +209,8 @@ class NovelCharacterEvents:
             print("已生成场景开头")
             chunk_scenes = self.extract_context(chapter_text, chunk_scenes)
             print("已成功分割场景")
+            up_content = chunk_scenes["scenes"][-1]["scene_text"]
+            chunk_scenes["scenes"].pop()
             detailed_scenes = self.extract_scene_detail(chunk_scenes)
             detailed_scenes["chapter"] = i + 1
             detailed_scenes["scene_num"] = len(detailed_scenes["scenes"])
@@ -225,14 +228,13 @@ class NovelCharacterEvents:
 
         
     def extract_context(self, full_text, scenes_data):
-        extracted_scenes = {}
-        extracted_scenes["scenes"] = []
-        
+        extracted_scenes = {"scenes": []}
+
         for i, scene in enumerate(scenes_data["scenes"]):
             start_str = scene["str_start"]
             print(start_str)
             start_index = full_text.find(start_str)
-            while(start_index == -1):
+            while start_index == -1:
                 prompt = f"""
                 Analyze the provided novel text excerpt and identify sentences that are **subtly similar** to `{start_str}`. Return these identified sentences in their original form.
 
