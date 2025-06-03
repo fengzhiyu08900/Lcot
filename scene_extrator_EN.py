@@ -209,7 +209,7 @@ class NovelCharacterEvents:
             print("已生成场景开头")
             chunk_scenes = self.extract_context(chapter_text, chunk_scenes)
             print("已成功分割场景")
-            up_content = chunk_scenes["scenes"][-1]["scene_text"]
+            up_content = chunk_scenes["scenes"][-1]["context"]
             chunk_scenes["scenes"].pop()
             detailed_scenes = self.extract_scene_detail(chunk_scenes)
             detailed_scenes["chapter"] = i + 1
